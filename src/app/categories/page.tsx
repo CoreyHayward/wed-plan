@@ -108,7 +108,7 @@ export default function CategoriesPage() {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={(e) => deleteCategory(cat.id, e)}
-                      className="p-2 rounded-full opacity-0 group-hover:opacity-100 hover:bg-destructive/10 transition-all"
+                      className="p-2 rounded-full hover:bg-destructive/10 transition-all"
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </button>
