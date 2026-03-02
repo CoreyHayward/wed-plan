@@ -1,0 +1,14 @@
+services:
+  wed-plan:
+    build: .
+    container_name: wed-plan
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - wed-plan-data:/data
+    environment:
+      DATABASE_PATH: /data/wedding.db
+
+volumes:
+  wed-plan-data:
