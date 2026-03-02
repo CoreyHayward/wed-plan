@@ -1,0 +1,22 @@
+{
+  "name": "Wed Plan",
+  "short_name": "Wed Plan",
+  "description": "Track your wedding costs, compare vendors, and manage your budget",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf9f7",
+  "theme_color": "#8b6f4e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
