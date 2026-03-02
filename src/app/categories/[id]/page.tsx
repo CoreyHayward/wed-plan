@@ -149,6 +149,11 @@ export default function CategoryDetailPage() {
     fetchData();
   };
 
+  const deselectVendor = async (vendorId: number) => {
+    await fetch(`/api/vendors/${vendorId}/deselect`, { method: "PUT" });
+    fetchData();
+  };
+
   const updateBudget = async () => {
     await fetch(`/api/categories/${categoryId}`, {
       method: "PUT",
@@ -365,6 +370,16 @@ export default function CategoryDetailPage() {
                     >
                       <Check className="w-3.5 h-3.5 mr-1" />
                       Select
+                    </Button>
+                  )}
+                  {vendor.isSelected && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => deselectVendor(vendor.id)}
+                      className="flex-1"
+                    >
+                      Deselect
                     </Button>
                   )}
                   <Button
