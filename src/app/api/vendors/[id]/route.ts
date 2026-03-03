@@ -41,6 +41,10 @@ export async function PUT(
       ...(body.contactInfo !== undefined && { contactInfo: body.contactInfo }),
       ...(body.depositPaid !== undefined && { depositPaid: body.depositPaid }),
       ...(body.totalPaid !== undefined && { totalPaid: body.totalPaid }),
+      ...(body.depositDueDate !== undefined && { depositDueDate: body.depositDueDate || null }),
+      ...(body.finalPaymentDueDate !== undefined && {
+        finalPaymentDueDate: body.finalPaymentDueDate || null,
+      }),
     })
     .where(eq(vendors.id, parseInt(id)))
     .returning()

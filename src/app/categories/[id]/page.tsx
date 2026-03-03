@@ -22,6 +22,8 @@ import {
   ThumbsUp,
   ThumbsDown,
   StickyNote,
+  CalendarClock,
+  X,
 } from "lucide-react";
 import type { Category, Vendor } from "@/db/schema";
 
@@ -50,6 +52,8 @@ export default function CategoryDetailPage() {
     contactInfo: "",
     depositPaid: "",
     totalPaid: "",
+    depositDueDate: "",
+    finalPaymentDueDate: "",
   });
   const [budgetInput, setBudgetInput] = useState("");
   const [nameInput, setNameInput] = useState("");
@@ -80,6 +84,8 @@ export default function CategoryDetailPage() {
       contactInfo: "",
       depositPaid: "",
       totalPaid: "",
+      depositDueDate: "",
+      finalPaymentDueDate: "",
     });
   };
 
@@ -99,6 +105,8 @@ export default function CategoryDetailPage() {
       contactInfo: vendor.contactInfo || "",
       depositPaid: vendor.depositPaid.toString(),
       totalPaid: vendor.totalPaid.toString(),
+      depositDueDate: vendor.depositDueDate || "",
+      finalPaymentDueDate: vendor.finalPaymentDueDate || "",
     });
     setEditingVendor(vendor);
     setShowAddVendor(true);
@@ -116,6 +124,8 @@ export default function CategoryDetailPage() {
       contactInfo: form.contactInfo,
       depositPaid: parseCurrencyInput(form.depositPaid),
       totalPaid: parseCurrencyInput(form.totalPaid),
+      depositDueDate: form.depositDueDate || null,
+      finalPaymentDueDate: form.finalPaymentDueDate || null,
     };
 
     if (editingVendor) {
@@ -359,6 +369,25 @@ export default function CategoryDetailPage() {
                   </div>
                 )}
 
+                {(vendor.depositDueDate || vendor.finalPaymentDueDate) && (
+                  <div className="text-xs text-muted-foreground mb-3 bg-muted/30 rounded-lg p-2">
+                    <div className="space-y-2">
+                      {vendor.depositDueDate && (
+                        <div className="flex items-center gap-1.5">
+                          <CalendarClock className="w-3.5 h-3.5" />
+                          <span>Deposit due: {vendor.depositDueDate}</span>
+                        </div>
+                      )}
+                      {vendor.finalPaymentDueDate && (
+                        <div className="flex items-center gap-1.5">
+                          <CalendarClock className="w-3.5 h-3.5" />
+                          <span>Final payment due: {vendor.finalPaymentDueDate}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Actions */}
                 <div className="flex gap-2">
                   {!vendor.isSelected && (
@@ -494,6 +523,49 @@ export default function CategoryDetailPage() {
                 value={form.totalPaid}
                 onChange={(e) => setForm({ ...form, totalPaid: e.target.value })}
               />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Deposit Due Date</label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={form.depositDueDate}
+                  onChange={(e) => setForm({ ...form, depositDueDate: e.target.value })}
+                />
+                {form.depositDueDate && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, depositDueDate: "" })}
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                    aria-label="Clear deposit due date"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Final Payment Due</label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={form.finalPaymentDueDate}
+                  onChange={(e) => setForm({ ...form, finalPaymentDueDate: e.target.value })}
+                />
+                {form.finalPaymentDueDate && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, finalPaymentDueDate: "" })}
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                    aria-label="Clear final payment due date"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           <Button type="submit" className="w-full" disabled={!form.name.trim()}>

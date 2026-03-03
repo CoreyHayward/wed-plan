@@ -32,6 +32,8 @@ export const vendors = sqliteTable("vendors", {
   contactInfo: text("contact_info").default(""),
   depositPaid: real("deposit_paid").notNull().default(0),
   totalPaid: real("total_paid").notNull().default(0),
+  depositDueDate: text("deposit_due_date"),
+  finalPaymentDueDate: text("final_payment_due_date"),
   createdAt: text("created_at")
     .notNull()
     .default(sql`(datetime('now'))`),
