@@ -25,7 +25,7 @@ import {
   CalendarClock,
   X,
 } from "lucide-react";
-import type { Category, Vendor } from "@/db/schema";
+import type { Category, Vendor, Group } from "@/db/schema";
 
 export default function CategoryDetailPage() {
   const params = useParams();
@@ -33,6 +33,7 @@ export default function CategoryDetailPage() {
   const categoryId = params.id as string;
 
   const [category, setCategory] = useState<Category | null>(null);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,6 +42,7 @@ export default function CategoryDetailPage() {
   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
   const [showEditBudget, setShowEditBudget] = useState(false);
   const [showEditName, setShowEditName] = useState(false);
+  const [showEditGroup, setShowEditGroup] = useState(false);
 
   // Form state
   const [form, setForm] = useState({
@@ -57,16 +59,20 @@ export default function CategoryDetailPage() {
   });
   const [budgetInput, setBudgetInput] = useState("");
   const [nameInput, setNameInput] = useState("");
+  const [groupInput, setGroupInput] = useState("");
 
   const fetchData = useCallback(async () => {
-    const [catRes, vendorRes] = await Promise.all([
+    const [catRes, vendorRes, groupRes] = await Promise.all([
       fetch(`/api/categories/${categoryId}`),
       fetch(`/api/categories/${categoryId}/vendors`),
+      fetch(`/api/groups`),
     ]);
     const catData = await catRes.json();
     const vendorData = await vendorRes.json();
+    const groupData = await groupRes.json();
     setCategory(catData);
     setVendors(vendorData);
+    setGroups(groupData);
     setLoading(false);
   }, [categoryId]);
 
@@ -164,6 +170,15 @@ export default function CategoryDetailPage() {
     fetchData();
   };
 
+  const markBooked = async (vendorId: number, booked: boolean) => {
+    await fetch(`/api/vendors/${vendorId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isBooked: booked }),
+    });
+    fetchData();
+  };
+
   const updateBudget = async () => {
     await fetch(`/api/categories/${categoryId}`, {
       method: "PUT",
@@ -185,6 +200,17 @@ export default function CategoryDetailPage() {
     fetchData();
   };
 
+  const updateGroup = async () => {
+    if (!groupInput) return;
+    await fetch(`/api/categories/${categoryId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ groupId: parseInt(groupInput) }),
+    });
+    setShowEditGroup(false);
+    fetchData();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60dvh]">
@@ -196,7 +222,7 @@ export default function CategoryDetailPage() {
   if (!category) {
     return (
       <div className="max-w-lg mx-auto px-4 pt-6">
-        <p>Category not found.</p>
+        <p>Expense not found.</p>
         <Button variant="outline" onClick={() => router.push("/")}>
           Go back
         </Button>
@@ -240,10 +266,19 @@ export default function CategoryDetailPage() {
               ? formatCurrency(category.budgetAllocation)
               : "Set budget →"}
           </button>
+          <button
+            onClick={() => {
+              setGroupInput(String(category.groupId));
+              setShowEditGroup(true);
+            }}
+            className="block text-xs text-muted-foreground hover:text-foreground transition-colors mt-1"
+          >
+            Group: {groups.find((g) => g.id === category.groupId)?.name || "General"} →
+          </button>
         </div>
       </div>
 
-      {/* Budget progress for this category */}
+      {/* Budget progress for this expense */}
       {category.budgetAllocation > 0 && selectedVendor && (
         <div className="mb-4">
           <ProgressBar
@@ -314,9 +349,9 @@ export default function CategoryDetailPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold truncate">{vendor.name}</h3>
                       {vendor.isSelected && (
-                        <Badge variant="success">
+                        <Badge variant={vendor.isBooked ? "success" : "secondary"}>
                           <Check className="w-3 h-3 mr-0.5" />
-                          Selected
+                          {vendor.isBooked ? "Booked" : "Selected"}
                         </Badge>
                       )}
                       {cheapestVendor && vendor.id === cheapestVendor.id && !vendor.isSelected && (
@@ -402,14 +437,23 @@ export default function CategoryDetailPage() {
                     </Button>
                   )}
                   {vendor.isSelected && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => deselectVendor(vendor.id)}
-                      className="flex-1"
-                    >
-                      Deselect
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => deselectVendor(vendor.id)}
+                        className="flex-1"
+                      >
+                        Deselect
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => markBooked(vendor.id, !vendor.isBooked)}
+                      >
+                        {vendor.isBooked ? "Unbook" : "Book"}
+                      </Button>
+                    </>
                   )}
                   <Button
                     size="sm"
@@ -578,7 +622,7 @@ export default function CategoryDetailPage() {
       <Sheet
         open={showEditBudget}
         onClose={() => setShowEditBudget(false)}
-        title="Set Category Budget"
+        title="Set Expense Budget"
       >
         <form
           onSubmit={(e) => {
@@ -610,7 +654,7 @@ export default function CategoryDetailPage() {
       <Sheet
         open={showEditName}
         onClose={() => setShowEditName(false)}
-        title="Rename Category"
+        title="Rename Expense"
       >
         <form
           onSubmit={(e) => {
@@ -621,7 +665,7 @@ export default function CategoryDetailPage() {
         >
           <div>
             <label className="text-sm font-medium mb-1.5 block">
-              Category Name
+              Expense Name
             </label>
             <Input
               value={nameInput}
@@ -631,6 +675,40 @@ export default function CategoryDetailPage() {
           </div>
           <Button type="submit" className="w-full" disabled={!nameInput.trim()}>
             Save
+          </Button>
+        </form>
+      </Sheet>
+
+      {/* Edit Group Sheet */}
+      <Sheet
+        open={showEditGroup}
+        onClose={() => setShowEditGroup(false)}
+        title="Move Expense to Group"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateGroup();
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Group</label>
+            <select
+              value={groupInput}
+              onChange={(e) => setGroupInput(e.target.value)}
+              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              autoFocus
+            >
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button type="submit" className="w-full" disabled={!groupInput}>
+            Save Group
           </Button>
         </form>
       </Sheet>

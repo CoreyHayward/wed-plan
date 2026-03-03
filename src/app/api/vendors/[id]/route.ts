@@ -41,6 +41,7 @@ export async function PUT(
       ...(body.contactInfo !== undefined && { contactInfo: body.contactInfo }),
       ...(body.depositPaid !== undefined && { depositPaid: body.depositPaid }),
       ...(body.totalPaid !== undefined && { totalPaid: body.totalPaid }),
+      ...(body.isBooked !== undefined && { isBooked: !!body.isBooked }),
       ...(body.depositDueDate !== undefined && { depositDueDate: body.depositDueDate || null }),
       ...(body.finalPaymentDueDate !== undefined && {
         finalPaymentDueDate: body.finalPaymentDueDate || null,

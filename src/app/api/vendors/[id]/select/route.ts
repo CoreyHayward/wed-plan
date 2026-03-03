@@ -25,7 +25,7 @@ export async function PUT(
 
   // Deselect all vendors in the same category
   db.update(vendors)
-    .set({ isSelected: false })
+    .set({ isSelected: false, isBooked: false })
     .where(eq(vendors.categoryId, vendor.categoryId))
     .run();
 

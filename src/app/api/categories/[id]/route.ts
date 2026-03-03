@@ -38,6 +38,7 @@ export async function PUT(
         budgetAllocation: body.budgetAllocation,
       }),
       ...(body.sortOrder !== undefined && { sortOrder: body.sortOrder }),
+      ...(body.groupId !== undefined && { groupId: body.groupId }),
     })
     .where(eq(categories.id, parseInt(id)))
     .returning()

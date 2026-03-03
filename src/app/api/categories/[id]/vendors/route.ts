@@ -38,6 +38,7 @@ export async function POST(
       contactInfo: body.contactInfo || "",
       depositPaid: body.depositPaid || 0,
       totalPaid: body.totalPaid || 0,
+      isBooked: body.isBooked || false,
       depositDueDate: body.depositDueDate || null,
       finalPaymentDueDate: body.finalPaymentDueDate || null,
     })

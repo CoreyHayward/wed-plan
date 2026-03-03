@@ -25,9 +25,17 @@ db.exec(`
     value TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS groups (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT    NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS categories (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     name              TEXT    NOT NULL,
+    group_id          INTEGER NOT NULL DEFAULT 1 REFERENCES groups(id) ON DELETE RESTRICT,
     budget_allocation REAL    NOT NULL DEFAULT 0,
     sort_order        INTEGER NOT NULL DEFAULT 0,
     created_at        TEXT    NOT NULL DEFAULT (datetime('now'))
@@ -42,6 +50,7 @@ db.exec(`
     pros                   TEXT    DEFAULT '',
     cons                   TEXT    DEFAULT '',
     is_selected            INTEGER NOT NULL DEFAULT 0,
+    is_booked              INTEGER NOT NULL DEFAULT 0,
     contact_info           TEXT    DEFAULT '',
     deposit_paid           REAL    NOT NULL DEFAULT 0,
     total_paid             REAL    NOT NULL DEFAULT 0,
@@ -60,8 +69,24 @@ function ensureColumn(table, column, definition) {
   }
 }
 
+ensureColumn("vendors", "is_booked", "INTEGER NOT NULL DEFAULT 0");
 ensureColumn("vendors", "deposit_due_date", "TEXT");
 ensureColumn("vendors", "final_payment_due_date", "TEXT");
+ensureColumn("categories", "group_id", "INTEGER NOT NULL DEFAULT 1");
+
+// Ensure at least one group exists and backfill category group ids
+const groupCount = db.prepare("SELECT COUNT(*) AS count FROM groups").get();
+if (!groupCount || groupCount.count === 0) {
+  db.prepare("INSERT INTO groups (name, sort_order) VALUES (?, ?)").run("General", 0);
+  console.log("✓ Seeded default group.");
+}
+
+const defaultGroup =
+  db.prepare("SELECT id FROM groups ORDER BY sort_order, id LIMIT 1").get() ||
+  db.prepare("SELECT id FROM groups ORDER BY id LIMIT 1").get();
+if (defaultGroup?.id) {
+  db.prepare("UPDATE categories SET group_id = ? WHERE group_id IS NULL OR group_id = 0").run(defaultGroup.id);
+}
 
 // Only seed once
 const already = db
@@ -76,8 +101,11 @@ if (!already) {
   insertSetting.run("weddingDate", "");
   insertSetting.run("coupleNames", "");
 
+  const defaultGroupId =
+    db.prepare("SELECT id FROM groups ORDER BY sort_order, id LIMIT 1").get()?.id || 1;
+
   const insertCat = db.prepare(
-    "INSERT INTO categories (name, budget_allocation, sort_order) VALUES (?, 0, ?)"
+    "INSERT INTO categories (name, group_id, budget_allocation, sort_order) VALUES (?, ?, 0, ?)"
   );
   [
     "Venue",
@@ -95,7 +123,7 @@ if (!already) {
     "Rings",
     "Favours",
     "Honeymoon",
-  ].forEach((name, i) => insertCat.run(name, i));
+  ].forEach((name, i) => insertCat.run(name, defaultGroupId, i));
 
   console.log("✓ Database seeded with defaults.");
 } else {

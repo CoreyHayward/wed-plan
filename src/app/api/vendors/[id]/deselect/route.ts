@@ -14,7 +14,7 @@ export async function PUT(
 
   const result = db
     .update(vendors)
-    .set({ isSelected: false })
+    .set({ isSelected: false, isBooked: false })
     .where(eq(vendors.id, vendorId))
     .returning()
     .get();

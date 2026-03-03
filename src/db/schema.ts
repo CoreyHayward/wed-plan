@@ -6,9 +6,22 @@ export const settings = sqliteTable("settings", {
   value: text("value").notNull(),
 });
 
+export const groups = sqliteTable("groups", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
 export const categories = sqliteTable("categories", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
+  groupId: integer("group_id")
+    .notNull()
+    .references(() => groups.id, { onDelete: "restrict" })
+    .default(1),
   budgetAllocation: real("budget_allocation").notNull().default(0),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: text("created_at")
@@ -29,6 +42,9 @@ export const vendors = sqliteTable("vendors", {
   isSelected: integer("is_selected", { mode: "boolean" })
     .notNull()
     .default(false),
+  isBooked: integer("is_booked", { mode: "boolean" })
+    .notNull()
+    .default(false),
   contactInfo: text("contact_info").default(""),
   depositPaid: real("deposit_paid").notNull().default(0),
   totalPaid: real("total_paid").notNull().default(0),
@@ -41,6 +57,7 @@ export const vendors = sqliteTable("vendors", {
 
 // Type exports
 export type Setting = typeof settings.$inferSelect;
+export type Group = typeof groups.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Vendor = typeof vendors.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;

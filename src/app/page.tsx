@@ -22,35 +22,44 @@ import {
   CreditCard,
   CalendarClock,
   AlertTriangle,
+  ChevronDown,
 } from "lucide-react";
 import type { DashboardData } from "@/app/api/dashboard/route";
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showAddCategory, setShowAddCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState("");
+  const [showAddExpense, setShowAddExpense] = useState(false);
+  const [newExpenseName, setNewExpenseName] = useState("");
+  const [newExpenseGroupId, setNewExpenseGroupId] = useState<string>("");
+  const [collapsedGroupIds, setCollapsedGroupIds] = useState<number[]>([]);
 
   const fetchData = useCallback(async () => {
     const res = await fetch("/api/dashboard");
     const json = await res.json();
     setData(json);
+    if (!newExpenseGroupId && json.groups?.[0]?.id) {
+      setNewExpenseGroupId(String(json.groups[0].id));
+    }
     setLoading(false);
-  }, []);
+  }, [newExpenseGroupId]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const addCategory = async () => {
-    if (!newCategoryName.trim()) return;
+  const addExpense = async () => {
+    if (!newExpenseName.trim()) return;
     await fetch("/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newCategoryName.trim() }),
+      body: JSON.stringify({
+        name: newExpenseName.trim(),
+        groupId: newExpenseGroupId ? parseInt(newExpenseGroupId) : undefined,
+      }),
     });
-    setNewCategoryName("");
-    setShowAddCategory(false);
+    setNewExpenseName("");
+    setShowAddExpense(false);
     fetchData();
   };
 
@@ -79,15 +88,23 @@ export default function DashboardPage() {
     return `Due in ${daysUntil}d`;
   };
 
+  const toggleGroup = (groupId: number) => {
+    setCollapsedGroupIds((prev) =>
+      prev.includes(groupId)
+        ? prev.filter((id) => id !== groupId)
+        : [...prev, groupId]
+    );
+  };
+
   return (
     <div className="max-w-lg mx-auto px-4 pt-6">
-      {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Wed Plan</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {data.coupleNames ? `${data.coupleNames} Wedding Plan` : "Wed Plan"}
+        </h1>
         <p className="text-muted-foreground text-sm">Your wedding budget at a glance</p>
       </div>
 
-      {/* Budget Summary */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -97,7 +114,6 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Main budget bar */}
             <div>
               <div className="flex justify-between text-sm mb-1.5">
                 <span className="text-muted-foreground">Committed</span>
@@ -105,42 +121,30 @@ export default function DashboardPage() {
                   {formatCurrency(data.totalCommitted)} / {formatCurrency(data.totalBudget)}
                 </span>
               </div>
-              <ProgressBar
-                value={data.totalCommitted}
-                max={data.totalBudget}
-                variant={budgetVariant}
-              />
+              <ProgressBar value={data.totalCommitted} max={data.totalBudget} variant={budgetVariant} />
             </div>
 
-            {/* Stats row */}
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center p-2 rounded-lg bg-muted/50">
                 <TrendingUp className="w-4 h-4 mx-auto mb-1 text-primary" />
                 <p className="text-xs text-muted-foreground">Remaining</p>
-                <p className="text-sm font-semibold">
-                  {formatCurrency(Math.max(0, remainingBudget))}
-                </p>
+                <p className="text-sm font-semibold">{formatCurrency(Math.max(0, remainingBudget))}</p>
               </div>
               <div className="text-center p-2 rounded-lg bg-muted/50">
                 <CreditCard className="w-4 h-4 mx-auto mb-1 text-success" />
                 <p className="text-xs text-muted-foreground">Paid</p>
-                <p className="text-sm font-semibold">
-                  {formatCurrency(data.totalPaid)}
-                </p>
+                <p className="text-sm font-semibold">{formatCurrency(data.totalPaid)}</p>
               </div>
               <div className="text-center p-2 rounded-lg bg-muted/50">
                 <Wallet className="w-4 h-4 mx-auto mb-1 text-amber-500" />
                 <p className="text-xs text-muted-foreground">Outstanding</p>
-                <p className="text-sm font-semibold">
-                  {formatCurrency(data.totalCommitted - data.totalPaid)}
-                </p>
+                <p className="text-sm font-semibold">{formatCurrency(data.totalCommitted - data.totalPaid)}</p>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Reminders */}
       {data.reminders.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
@@ -181,106 +185,122 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Categories */}
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold">Categories</h2>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setShowAddCategory(true)}
-        >
+        <h2 className="text-lg font-semibold">Expenses</h2>
+        <Button size="sm" variant="outline" onClick={() => setShowAddExpense(true)}>
           <Plus className="w-4 h-4 mr-1" />
           Add
         </Button>
       </div>
 
-      <div className="space-y-2 mb-6">
-        {data.categories.map((cat) => (
-          <Link key={cat.id} href={`/categories/${cat.id}`} className="block mb-2 last:mb-0">
-            <Card className="hover:bg-accent/30 transition-colors cursor-pointer">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-medium truncate">{cat.name}</h3>
-                      {cat.vendorCount > 0 && (
-                        <Badge variant="secondary">
-                          {cat.vendorCount} option{cat.vendorCount !== 1 ? "s" : ""}
-                        </Badge>
-                      )}
-                    </div>
+      <div className="space-y-4 mb-6">
+        {data.groups.map((group) => {
+          const isCollapsed = collapsedGroupIds.includes(group.id);
+          const remaining = group.budgetTotal - group.committedTotal;
 
-                    {cat.selectedVendor ? (
-                      <div className="flex items-center gap-2">
-                        <Badge variant="success">Booked</Badge>
-                        <span className="text-sm text-muted-foreground truncate">
-                          {cat.selectedVendor.name}
-                        </span>
-                        <span className="text-sm font-semibold ml-auto shrink-0">
-                          {formatCurrency(cat.selectedVendor.price)}
-                        </span>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        {cat.vendorCount > 0
-                          ? "No vendor selected yet"
-                          : "No options added yet"}
-                      </p>
-                    )}
-
-                    {cat.budgetAllocation > 0 && (
-                      <div className="mt-2">
-                        <ProgressBar
-                          value={cat.selectedVendor?.price || 0}
-                          max={cat.budgetAllocation}
-                          variant={
-                            cat.selectedVendor &&
-                            cat.selectedVendor.price > cat.budgetAllocation
-                              ? "danger"
-                              : "default"
-                          }
-                          className="h-1.5"
-                        />
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Budget: {formatCurrency(cat.budgetAllocation)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground ml-2 shrink-0" />
+          return (
+            <div key={group.id}>
+              <button
+                onClick={() => toggleGroup(group.id)}
+                className="w-full flex items-start justify-between mb-2 px-1"
+              >
+                <div className="text-left min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {group.name}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                    {formatCurrency(group.committedTotal)} / {formatCurrency(group.budgetTotal)} • {group.expenseCount} expense{group.expenseCount !== 1 ? "s" : ""} • {formatCurrency(remaining)} left
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+                {isCollapsed ? (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                )}
+              </button>
+
+              {!isCollapsed && (
+                <div className="space-y-2">
+                  {group.expenses.map((cat) => (
+                    <Link key={cat.id} href={`/categories/${cat.id}`} className="block mb-2 last:mb-0">
+                      <Card className="hover:bg-accent/30 transition-colors cursor-pointer">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-medium truncate">{cat.name}</h3>
+                                {cat.vendorCount > 0 && (
+                                  <Badge variant="secondary">
+                                    {cat.vendorCount} option{cat.vendorCount !== 1 ? "s" : ""}
+                                  </Badge>
+                                )}
+                              </div>
+
+                              {cat.selectedVendor ? (
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={cat.selectedVendor.isBooked ? "success" : "secondary"}>
+                                    {cat.selectedVendor.isBooked ? "Booked" : "Selected"}
+                                  </Badge>
+                                  <span className="text-sm text-muted-foreground truncate">{cat.selectedVendor.name}</span>
+                                  <span className="text-sm font-semibold ml-auto shrink-0">
+                                    {formatCurrency(cat.selectedVendor.price)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <p className="text-sm text-muted-foreground">
+                                  {cat.vendorCount > 0 ? "No vendor selected yet" : "No options added yet"}
+                                </p>
+                              )}
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground ml-2 shrink-0" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                  {group.expenses.length === 0 && (
+                    <p className="text-xs text-muted-foreground px-1">No expenses in this group yet.</p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Add Category Sheet */}
-      <Sheet
-        open={showAddCategory}
-        onClose={() => setShowAddCategory(false)}
-        title="Add Category"
-      >
+      <Sheet open={showAddExpense} onClose={() => setShowAddExpense(false)} title="Add Expense">
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            addCategory();
+            addExpense();
           }}
           className="space-y-4"
         >
           <div>
-            <label className="text-sm font-medium mb-1.5 block">
-              Category Name
-            </label>
+            <label className="text-sm font-medium mb-1.5 block">Expense Name</label>
             <Input
-              placeholder="e.g. Flowers & Décor"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="e.g. Venue"
+              value={newExpenseName}
+              onChange={(e) => setNewExpenseName(e.target.value)}
               autoFocus
             />
           </div>
-          <Button type="submit" className="w-full" disabled={!newCategoryName.trim()}>
-            Add Category
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Group</label>
+            <select
+              value={newExpenseGroupId}
+              onChange={(e) => setNewExpenseGroupId(e.target.value)}
+              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              {data.groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button type="submit" className="w-full" disabled={!newExpenseName.trim()}>
+            Add Expense
           </Button>
         </form>
       </Sheet>
