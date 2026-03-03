@@ -196,7 +196,7 @@ export default function DashboardPage() {
 
       <div className="space-y-2 mb-6">
         {data.categories.map((cat) => (
-          <Link key={cat.id} href={`/categories/${cat.id}`}>
+          <Link key={cat.id} href={`/categories/${cat.id}`} className="block mb-2 last:mb-0">
             <Card className="hover:bg-accent/30 transition-colors cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
