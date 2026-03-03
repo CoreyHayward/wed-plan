@@ -23,6 +23,7 @@ import {
   ThumbsDown,
   StickyNote,
   CalendarClock,
+  X,
 } from "lucide-react";
 import type { Category, Vendor } from "@/db/schema";
 
@@ -525,22 +526,46 @@ export default function CategoryDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-3">
             <div>
               <label className="text-sm font-medium mb-1.5 block">Deposit Due Date</label>
-              <Input
-                type="date"
-                value={form.depositDueDate}
-                onChange={(e) => setForm({ ...form, depositDueDate: e.target.value })}
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={form.depositDueDate}
+                  onChange={(e) => setForm({ ...form, depositDueDate: e.target.value })}
+                />
+                {form.depositDueDate && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, depositDueDate: "" })}
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                    aria-label="Clear deposit due date"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Final Payment Due</label>
-              <Input
-                type="date"
-                value={form.finalPaymentDueDate}
-                onChange={(e) => setForm({ ...form, finalPaymentDueDate: e.target.value })}
-              />
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={form.finalPaymentDueDate}
+                  onChange={(e) => setForm({ ...form, finalPaymentDueDate: e.target.value })}
+                />
+                {form.finalPaymentDueDate && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, finalPaymentDueDate: "" })}
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                    aria-label="Clear final payment due date"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           <Button type="submit" className="w-full" disabled={!form.name.trim()}>
