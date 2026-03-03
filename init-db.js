@@ -34,20 +34,34 @@ db.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS vendors (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    category_id  INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-    name         TEXT    NOT NULL,
-    price        REAL    NOT NULL DEFAULT 0,
-    notes        TEXT    DEFAULT '',
-    pros         TEXT    DEFAULT '',
-    cons         TEXT    DEFAULT '',
-    is_selected  INTEGER NOT NULL DEFAULT 0,
-    contact_info TEXT    DEFAULT '',
-    deposit_paid REAL    NOT NULL DEFAULT 0,
-    total_paid   REAL    NOT NULL DEFAULT 0,
-    created_at   TEXT    NOT NULL DEFAULT (datetime('now'))
+    id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id            INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    name                   TEXT    NOT NULL,
+    price                  REAL    NOT NULL DEFAULT 0,
+    notes                  TEXT    DEFAULT '',
+    pros                   TEXT    DEFAULT '',
+    cons                   TEXT    DEFAULT '',
+    is_selected            INTEGER NOT NULL DEFAULT 0,
+    contact_info           TEXT    DEFAULT '',
+    deposit_paid           REAL    NOT NULL DEFAULT 0,
+    total_paid             REAL    NOT NULL DEFAULT 0,
+    deposit_due_date       TEXT,
+    final_payment_due_date TEXT,
+    created_at             TEXT    NOT NULL DEFAULT (datetime('now'))
   );
 `);
+
+// Lightweight migrations for existing databases
+function ensureColumn(table, column, definition) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+    console.log(`✓ Added column ${table}.${column}`);
+  }
+}
+
+ensureColumn("vendors", "deposit_due_date", "TEXT");
+ensureColumn("vendors", "final_payment_due_date", "TEXT");
 
 // Only seed once
 const already = db

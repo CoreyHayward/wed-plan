@@ -14,7 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet } from "@/components/ui/sheet";
 import { formatCurrency } from "@/lib/utils";
-import { Plus, ChevronRight, TrendingUp, Wallet, CreditCard } from "lucide-react";
+import {
+  Plus,
+  ChevronRight,
+  TrendingUp,
+  Wallet,
+  CreditCard,
+  CalendarClock,
+  AlertTriangle,
+} from "lucide-react";
 import type { DashboardData } from "@/app/api/dashboard/route";
 
 export default function DashboardPage() {
@@ -63,6 +71,13 @@ export default function DashboardPage() {
       : remainingBudget < data.totalBudget * 0.1
       ? "warning"
       : "default";
+
+  const reminderLabel = (daysUntil: number) => {
+    if (daysUntil < 0) return `${Math.abs(daysUntil)}d overdue`;
+    if (daysUntil === 0) return "Due today";
+    if (daysUntil === 1) return "Due tomorrow";
+    return `Due in ${daysUntil}d`;
+  };
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-6">
@@ -124,6 +139,47 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Reminders */}
+      {data.reminders.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarClock className="w-4 h-4 text-primary" />
+              Upcoming Reminders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {data.reminders.map((r) => (
+                <Link key={`${r.vendorId}-${r.type}`} href={`/categories/${r.categoryId}`}>
+                  <div className="flex items-center justify-between rounded-lg border p-2.5 hover:bg-accent/30 transition-colors cursor-pointer">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{r.vendorName}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {r.categoryName} • {r.type === "deposit" ? "Deposit" : "Final payment"}
+                      </p>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className={
+                        r.status === "overdue"
+                          ? "bg-destructive text-destructive-foreground"
+                          : r.status === "today"
+                          ? "bg-amber-500 text-white"
+                          : undefined
+                      }
+                    >
+                      {r.status === "overdue" && <AlertTriangle className="w-3 h-3 mr-1" />}
+                      {reminderLabel(r.daysUntil)}
+                    </Badge>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Categories */}
       <div className="flex items-center justify-between mb-3">
