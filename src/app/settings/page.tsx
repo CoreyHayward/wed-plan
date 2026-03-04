@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
-import { Settings as SettingsIcon, Save } from "lucide-react";
+import { Settings as SettingsIcon, Save, Moon, Sun } from "lucide-react";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [theme, setTheme] = useState<"system" | "light" | "dark">("system");
 
   const fetchSettings = useCallback(async () => {
     const res = await fetch("/api/settings");
@@ -22,6 +23,10 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchSettings();
+    const html = document.documentElement;
+    if (html.classList.contains("dark")) setTheme("dark");
+    else if (html.classList.contains("light")) setTheme("light");
+    else setTheme("system");
   }, [fetchSettings]);
 
   const saveSettings = async () => {
@@ -34,6 +39,18 @@ export default function SettingsPage() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const setAppTheme = (next: "system" | "light" | "dark") => {
+    const html = document.documentElement;
+    html.classList.remove("light", "dark");
+    if (next === "light" || next === "dark") {
+      html.classList.add(next);
+      localStorage.setItem("theme", next);
+    } else {
+      localStorage.removeItem("theme");
+    }
+    setTheme(next);
   };
 
   if (loading) {
@@ -88,7 +105,7 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle>Budget</CardTitle>
         </CardHeader>
@@ -110,6 +127,39 @@ export default function SettingsPage() {
               Currently set to{" "}
               {formatCurrency(parseFloat(settings.totalBudget || "0"))}
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant={theme === "light" ? "default" : "outline"}
+              onClick={() => setAppTheme("light")}
+            >
+              <Sun className="w-4 h-4 mr-1" />
+              Light
+            </Button>
+            <Button
+              type="button"
+              variant={theme === "dark" ? "default" : "outline"}
+              onClick={() => setAppTheme("dark")}
+            >
+              <Moon className="w-4 h-4 mr-1" />
+              Dark
+            </Button>
+            <Button
+              type="button"
+              variant={theme === "system" ? "default" : "outline"}
+              onClick={() => setAppTheme("system")}
+            >
+              System
+            </Button>
           </div>
         </CardContent>
       </Card>
