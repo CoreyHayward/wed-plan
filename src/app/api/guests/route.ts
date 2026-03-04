@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { db } from "@/db";
 import { guests, households } from "@/db/schema";
+import { formatGuestName } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export type GuestWithHousehold = {
@@ -53,7 +54,7 @@ export async function GET() {
 
   const householdMap = new Map(allHouseholds.map((h) => [h.id, h.name]));
   const guestMap = new Map(
-    allGuests.map((g) => [g.id, `${g.firstName} ${g.lastName || ""}`.trim()])
+    allGuests.map((g) => [g.id, formatGuestName(g.firstName, g.lastName)])
   );
 
   const guestsWithDetails: GuestWithHousehold[] = allGuests.map((g) => ({

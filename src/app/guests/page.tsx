@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet } from "@/components/ui/sheet";
+import { formatGuestName } from "@/lib/utils";
 import {
   Users,
   UserPlus,
@@ -232,7 +233,7 @@ export default function GuestsPage() {
   if (!data) return null;
 
   const filteredGuests = data.guests.filter((g) => {
-    const name = `${g.firstName} ${g.lastName || ""}`.toLowerCase();
+    const name = formatGuestName(g.firstName, g.lastName).toLowerCase();
     const matchesSearch =
       !searchQuery ||
       name.includes(searchQuery.toLowerCase()) ||

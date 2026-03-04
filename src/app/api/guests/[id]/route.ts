@@ -69,7 +69,7 @@ export async function DELETE(
 
   // Also unlink any plus-ones that reference this guest
   db.update(guests)
-    .set({ linkedGuestId: null, isPlusOne: false })
+    .set({ linkedGuestId: null })
     .where(eq(guests.linkedGuestId, guestId))
     .run();
 
