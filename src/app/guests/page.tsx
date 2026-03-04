@@ -104,15 +104,44 @@ export default function GuestsPage() {
   const [showMoreFields, setShowMoreFields] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const [guestRes, householdRes] = await Promise.all([
-      fetch("/api/guests"),
-      fetch("/api/households"),
-    ]);
-    const guestData = await guestRes.json();
-    const householdData = await householdRes.json();
-    setData(guestData);
-    setHouseholds(householdData);
-    setLoading(false);
+    try {
+      const [guestRes, householdRes] = await Promise.all([
+        fetch("/api/guests"),
+        fetch("/api/households"),
+      ]);
+
+      if (!guestRes.ok || !householdRes.ok) {
+        throw new Error("Failed to fetch guest data");
+      }
+
+      const guestData = await guestRes.json();
+      const householdData = await householdRes.json();
+      setData(guestData);
+      setHouseholds(householdData);
+    } catch (error) {
+      console.error("Failed to load guests page:", error);
+      setData({
+        guests: [],
+        summary: {
+          total: 0,
+          accepted: 0,
+          declined: 0,
+          pending: 0,
+          brideGuests: 0,
+          groomGuests: 0,
+          jointGuests: 0,
+          ceremonyCount: 0,
+          receptionCount: 0,
+          eveningCount: 0,
+          allDayCount: 0,
+          plusOnes: 0,
+          householdCount: 0,
+        },
+      });
+      setHouseholds([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

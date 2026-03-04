@@ -58,6 +58,33 @@ db.exec(`
     final_payment_due_date TEXT,
     created_at             TEXT    NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS households (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT    NOT NULL,
+    address    TEXT    DEFAULT '',
+    created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS guests (
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name           TEXT    NOT NULL,
+    last_name            TEXT    DEFAULT '',
+    email                TEXT    DEFAULT '',
+    phone                TEXT    DEFAULT '',
+    household_id         INTEGER REFERENCES households(id) ON DELETE SET NULL,
+    party                TEXT    NOT NULL DEFAULT 'joint',
+    attendance           TEXT    NOT NULL DEFAULT 'all',
+    rsvp_status          TEXT    NOT NULL DEFAULT 'pending',
+    is_plus_one          INTEGER NOT NULL DEFAULT 0,
+    linked_guest_id      INTEGER,
+    dietary_requirements TEXT    DEFAULT '',
+    allergies            TEXT    DEFAULT '',
+    accessibility_needs  TEXT    DEFAULT '',
+    table_assignment     TEXT    DEFAULT '',
+    notes                TEXT    DEFAULT '',
+    created_at           TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
 `);
 
 // Lightweight migrations for existing databases
