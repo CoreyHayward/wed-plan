@@ -14,6 +14,10 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+export function formatGuestName(firstName: string, lastName?: string | null): string {
+  return `${firstName} ${lastName || ""}`.trim();
+}
+
 export function parseCurrencyInput(value: string): number {
   const cleaned = value.replace(/[^0-9.]/g, "");
   const parsed = parseFloat(cleaned);

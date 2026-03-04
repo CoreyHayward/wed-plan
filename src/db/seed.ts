@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { categories, settings } from "./schema";
+import { categories, groups, settings } from "./schema";
 import { sql } from "drizzle-orm";
 
 const DEFAULT_CATEGORIES = [
@@ -27,9 +27,17 @@ export async function seed() {
     value TEXT NOT NULL
   )`);
 
+  db.run(sql`CREATE TABLE IF NOT EXISTS groups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+
   db.run(sql`CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    group_id INTEGER NOT NULL DEFAULT 1 REFERENCES groups(id),
     budget_allocation REAL NOT NULL DEFAULT 0,
     sort_order INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -44,9 +52,39 @@ export async function seed() {
     pros TEXT DEFAULT '',
     cons TEXT DEFAULT '',
     is_selected INTEGER NOT NULL DEFAULT 0,
+    is_booked INTEGER NOT NULL DEFAULT 0,
     contact_info TEXT DEFAULT '',
     deposit_paid REAL NOT NULL DEFAULT 0,
     total_paid REAL NOT NULL DEFAULT 0,
+    deposit_due_date TEXT,
+    final_payment_due_date TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+
+  db.run(sql`CREATE TABLE IF NOT EXISTS households (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+
+  db.run(sql`CREATE TABLE IF NOT EXISTS guests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name TEXT NOT NULL,
+    last_name TEXT DEFAULT '',
+    email TEXT DEFAULT '',
+    phone TEXT DEFAULT '',
+    household_id INTEGER REFERENCES households(id) ON DELETE SET NULL,
+    party TEXT NOT NULL DEFAULT 'joint',
+    attendance TEXT NOT NULL DEFAULT 'all',
+    rsvp_status TEXT NOT NULL DEFAULT 'pending',
+    is_plus_one INTEGER NOT NULL DEFAULT 0,
+    linked_guest_id INTEGER,
+    dietary_requirements TEXT DEFAULT '',
+    allergies TEXT DEFAULT '',
+    accessibility_needs TEXT DEFAULT '',
+    table_assignment TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`);
 
@@ -64,6 +102,12 @@ export async function seed() {
     { key: "coupleNames", value: "" },
     { key: "passphraseHash", value: "" },
   ]).run();
+
+  // Insert default group
+  db.insert(groups).values({
+    name: "General",
+    sortOrder: 0,
+  }).run();
 
   // Insert default categories
   DEFAULT_CATEGORIES.forEach((name, index) => {

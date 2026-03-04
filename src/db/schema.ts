@@ -55,6 +55,41 @@ export const vendors = sqliteTable("vendors", {
     .default(sql`(datetime('now'))`),
 });
 
+export const households = sqliteTable("households", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  address: text("address").default(""),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
+export const guests = sqliteTable("guests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").default(""),
+  email: text("email").default(""),
+  phone: text("phone").default(""),
+  householdId: integer("household_id").references(() => households.id, {
+    onDelete: "set null",
+  }),
+  party: text("party").notNull().default("joint"),
+  attendance: text("attendance").notNull().default("all"),
+  rsvpStatus: text("rsvp_status").notNull().default("pending"),
+  isPlusOne: integer("is_plus_one", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  linkedGuestId: integer("linked_guest_id"),
+  dietaryRequirements: text("dietary_requirements").default(""),
+  allergies: text("allergies").default(""),
+  accessibilityNeeds: text("accessibility_needs").default(""),
+  tableAssignment: text("table_assignment").default(""),
+  notes: text("notes").default(""),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
 // Type exports
 export type Setting = typeof settings.$inferSelect;
 export type Group = typeof groups.$inferSelect;
@@ -62,3 +97,7 @@ export type Category = typeof categories.$inferSelect;
 export type Vendor = typeof vendors.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type NewVendor = typeof vendors.$inferInsert;
+export type Household = typeof households.$inferSelect;
+export type NewHousehold = typeof households.$inferInsert;
+export type Guest = typeof guests.$inferSelect;
+export type NewGuest = typeof guests.$inferInsert;
