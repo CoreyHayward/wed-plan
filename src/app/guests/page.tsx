@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -36,6 +36,8 @@ type GuestForm = {
   email: string;
   phone: string;
   householdId: string;
+  newHouseholdName: string;
+  newHouseholdAddress: string;
   party: string;
   attendance: string;
   rsvpStatus: string;
@@ -54,6 +56,8 @@ const emptyForm: GuestForm = {
   email: "",
   phone: "",
   householdId: "",
+  newHouseholdName: "",
+  newHouseholdAddress: "",
   party: "joint",
   attendance: "all",
   rsvpStatus: "pending",
@@ -163,6 +167,8 @@ export default function GuestsPage() {
       email: guest.email || "",
       phone: guest.phone || "",
       householdId: guest.householdId ? String(guest.householdId) : "",
+      newHouseholdName: "",
+      newHouseholdAddress: "",
       party: guest.party,
       attendance: guest.attendance,
       rsvpStatus: guest.rsvpStatus,
@@ -181,9 +187,27 @@ export default function GuestsPage() {
   const saveGuest = async () => {
     if (!guestForm.firstName.trim()) return;
 
+    let householdId: number | null = guestForm.householdId
+      ? parseInt(guestForm.householdId)
+      : null;
+
+    if (guestForm.householdId === "__new__") {
+      if (!guestForm.newHouseholdName.trim()) return;
+      const householdRes = await fetch("/api/households", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: guestForm.newHouseholdName,
+          address: guestForm.newHouseholdAddress,
+        }),
+      });
+      const newHousehold = await householdRes.json();
+      householdId = newHousehold.id;
+    }
+
     const payload = {
       ...guestForm,
-      householdId: guestForm.householdId ? parseInt(guestForm.householdId) : null,
+      householdId,
       linkedGuestId: guestForm.linkedGuestId
         ? parseInt(guestForm.linkedGuestId)
         : null,
@@ -250,6 +274,27 @@ export default function GuestsPage() {
   const exportCsv = () => {
     window.open("/api/guests/export", "_blank");
   };
+
+  const rankedHouseholds = useMemo(() => {
+    const lastName = guestForm.lastName.trim().toLowerCase();
+
+    if (!lastName) {
+      return households;
+    }
+
+    const matches: Household[] = [];
+    const others: Household[] = [];
+
+    for (const household of households) {
+      if (household.name.toLowerCase().includes(lastName)) {
+        matches.push(household);
+      } else {
+        others.push(household);
+      }
+    }
+
+    return [...matches, ...others];
+  }, [households, guestForm.lastName]);
 
   if (loading) {
     return (
@@ -707,13 +752,43 @@ export default function GuestsPage() {
               className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm"
             >
               <option value="">No household</option>
-              {households.map((h) => (
+              <option value="__new__">+ Create new household</option>
+              {rankedHouseholds.map((h) => (
                 <option key={h.id} value={h.id}>
                   {h.name}
                 </option>
               ))}
             </select>
           </div>
+
+          {guestForm.householdId === "__new__" && (
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">
+                  New Household Name *
+                </label>
+                <Input
+                  placeholder="e.g. The Smith Family"
+                  value={guestForm.newHouseholdName}
+                  onChange={(e) =>
+                    setGuestForm({ ...guestForm, newHouseholdName: e.target.value })
+                  }
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">
+                  New Household Address
+                </label>
+                <Textarea
+                  placeholder="Full postal address for invitations..."
+                  value={guestForm.newHouseholdAddress}
+                  onChange={(e) =>
+                    setGuestForm({ ...guestForm, newHouseholdAddress: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          )}
 
           {/* Plus One */}
           <div className="flex items-center gap-3">
@@ -864,7 +939,11 @@ export default function GuestsPage() {
             <Button
               type="submit"
               className="w-full"
-              disabled={!guestForm.firstName.trim()}
+              disabled={
+                !guestForm.firstName.trim() ||
+                (guestForm.householdId === "__new__" &&
+                  !guestForm.newHouseholdName.trim())
+              }
             >
               {editingGuest ? "Save Changes" : "Add Guest"}
             </Button>
