@@ -55,6 +55,9 @@ Each option can be:
 - Total budget overview
 - Committed / Paid / Outstanding totals
 - Grouped expense list
+- Add expenses directly from the dashboard
+- Manage groups from the dashboard
+- Reorder expenses within each group via drag handles
 - Collapsible groups (mobile-friendly)
 - Group-level summary:
   - committed vs budget
@@ -63,14 +66,11 @@ Each option can be:
 - Upcoming payment reminders (deposit/final payment due)
 
 ## Expenses
-- Add/edit/delete expenses
-- Reorder expenses **within each group**
-- Group management:
-  - add/delete groups
-  - reorder groups
-- Collapse/expand groups for cleaner navigation
+- The previous standalone expenses page now redirects to the dashboard
+- Expense detail pages remain under `/categories/:id` for compatibility
 
 ## Expense detail
+- Delete the expense from the detail page
 - Add/edit/delete vendor options
 - Compare options side-by-side
 - Mark one option as selected
