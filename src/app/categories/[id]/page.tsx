@@ -77,6 +77,7 @@ export default function CategoryDetailPage() {
   }, [categoryId]);
 
   useEffect(() => {
+    // Defer the initial load to satisfy the repo's react-hooks/set-state-in-effect lint rule.
     const timeoutId = window.setTimeout(() => {
       void fetchData();
     }, 0);

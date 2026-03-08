@@ -55,6 +55,7 @@ export default function DashboardPage() {
   }, [newExpenseGroupId]);
 
   useEffect(() => {
+    // Defer the initial load to satisfy the repo's react-hooks/set-state-in-effect lint rule.
     const timeoutId = window.setTimeout(() => {
       void fetchData();
     }, 0);
@@ -162,7 +163,11 @@ export default function DashboardPage() {
   };
 
   const reorderExpenses = async (groupId: number, targetExpenseId: number) => {
-    if (!data || draggedExpenseId === null || draggedGroupId !== groupId || draggedExpenseId === targetExpenseId) {
+    const isMissingDragContext = !data || draggedExpenseId === null;
+    const isDifferentGroup = draggedGroupId !== groupId;
+    const isSameExpense = draggedExpenseId === targetExpenseId;
+
+    if (isMissingDragContext || isDifferentGroup || isSameExpense) {
       setDraggedExpenseId(null);
       setDraggedGroupId(null);
       setDragOverExpenseId(null);
