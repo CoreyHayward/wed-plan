@@ -7,9 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet } from "@/components/ui/sheet";
-import { CalendarClock, Clock3, Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarClock, Clock3, Heart, Moon, Pencil, Plus, Sunrise, Trash2, UtensilsCrossed } from "lucide-react";
 import { timelinePhases, compareTimelineItems, type TimelinePhase } from "@/lib/timeline";
 import type { TimelineItem } from "@/db/schema";
+
+const phaseIcons: Record<TimelinePhase, React.ReactNode> = {
+  morning: <Sunrise className="w-4 h-4 text-primary" />,
+  ceremony: <Heart className="w-4 h-4 text-primary" />,
+  reception: <UtensilsCrossed className="w-4 h-4 text-primary" />,
+  evening: <Moon className="w-4 h-4 text-primary" />,
+};
 
 type SettingsData = {
   coupleNames?: string;
@@ -219,97 +226,113 @@ export default function TimelinePage() {
         </CardContent>
       </Card>
 
-      <div className="space-y-4 pb-6">
+      {/* Vertical timeline */}
+      <div className="relative pb-6">
+        {/* Continuous vertical line */}
+        <div className="absolute left-[27px] top-0 bottom-0 w-0.5 bg-border" />
+
         {groupedItems.map((phase) => (
-          <Card key={phase.value}>
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <CardTitle className="text-base">{phase.label}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {phase.description}
-                  </p>
+          <div key={phase.value} className="mb-2">
+            {/* Phase heading row */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="relative z-10 flex w-14 shrink-0 justify-center">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary bg-background">
+                  {phaseIcons[phase.value]}
                 </div>
-                <Badge variant="secondary">
-                  {phase.items.length} moment{phase.items.length !== 1 ? "s" : ""}
-                </Badge>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {phase.items.length > 0 ? (
-                phase.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-xl border bg-background/80 p-4 shadow-sm"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="secondary" className="gap-1">
-                            <Clock3 className="w-3 h-3" />
-                            {formatDisplayTime(item.startTime)}
-                          </Badge>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="font-semibold">{phase.label}</h2>
+                  <Badge variant="secondary" className="shrink-0">
+                    {phase.items.length} moment{phase.items.length !== 1 ? "s" : ""}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">{phase.description}</p>
+              </div>
+            </div>
+
+            {/* Phase items */}
+            {phase.items.length > 0 ? (
+              <>
+                {phase.items.map((item) => (
+                  <div key={item.id} className="flex gap-3 mb-3">
+                    <div className="relative z-10 flex w-14 shrink-0 justify-center pt-5">
+                      <div className="h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-background" />
+                    </div>
+                    <div className="flex-1 rounded-xl border bg-background/80 p-4 shadow-sm">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary" className="gap-1">
+                              <Clock3 className="w-3 h-3" />
+                              {formatDisplayTime(item.startTime)}
+                            </Badge>
+                          </div>
+                          <h3 className="font-semibold">{item.title}</h3>
+                          {item.notes ? (
+                            <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+                              {item.notes}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Add details like supplier cues, room changes, or music notes.
+                            </p>
+                          )}
                         </div>
-                        <h2 className="font-semibold">{item.title}</h2>
-                        {item.notes ? (
-                          <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
-                            {item.notes}
-                          </p>
-                        ) : (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Add details like supplier cues, room changes, or music notes.
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Edit ${item.title}`}
-                          onClick={() => openEditMoment(item)}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Delete ${item.title}`}
-                          onClick={() => deleteMoment(item)}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Edit ${item.title}`}
+                            onClick={() => openEditMoment(item)}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Delete ${item.title}`}
+                            onClick={() => deleteMoment(item)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))
-              ) : (
+                ))}
+
+                <div className="flex gap-3 mb-6">
+                  <div className="w-14 shrink-0" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => openAddMoment(phase.value)}
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Add {phase.label.toLowerCase()} moment
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex gap-3 mb-6">
+                <div className="w-14 shrink-0" />
                 <button
                   type="button"
                   onClick={() => openAddMoment(phase.value)}
-                  className="w-full rounded-xl border border-dashed bg-muted/30 px-4 py-5 text-left transition-colors hover:bg-accent/40"
+                  className="flex-1 rounded-xl border border-dashed bg-muted/30 px-4 py-5 text-left transition-colors hover:bg-accent/40"
                 >
                   <p className="font-medium">Nothing planned here yet</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Add a moment for {phase.label.toLowerCase()} to keep the day flowing smoothly.
                   </p>
                 </button>
-              )}
-
-              {phase.items.length > 0 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => openAddMoment(phase.value)}
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add {phase.label.toLowerCase()} moment
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
