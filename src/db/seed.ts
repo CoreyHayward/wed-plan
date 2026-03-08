@@ -1,6 +1,7 @@
 import { db } from "./index";
 import { categories, groups, settings } from "./schema";
 import { sql } from "drizzle-orm";
+import { ensureTimelineItemsTable } from "./timeline";
 
 const DEFAULT_CATEGORIES = [
   "Venue",
@@ -61,6 +62,8 @@ export async function seed() {
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`);
 
+  ensureTimelineItemsTable();
+
   db.run(sql`CREATE TABLE IF NOT EXISTS households (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -118,7 +121,7 @@ export async function seed() {
     }).run();
   });
 
-  console.log("Database seeded with default categories and settings.");
+  console.log("Database seeded with default categories, timeline items, and settings.");
 }
 
 // Run if called directly
