@@ -129,7 +129,10 @@ export default function TimelinePage() {
       notes: form.notes.trim(),
     };
 
-    if (!payload.title) return;
+    if (!payload.title) {
+      alert("Please enter a moment name.");
+      return;
+    }
 
     const endpoint = editingItem ? `/api/timeline/${editingItem.id}` : "/api/timeline";
     const method = editingItem ? "PUT" : "POST";
@@ -140,7 +143,10 @@ export default function TimelinePage() {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) return;
+    if (!response.ok) {
+      alert("Could not save this timeline moment. Please try again.");
+      return;
+    }
 
     setShowEditor(false);
     setEditingItem(null);
@@ -152,7 +158,10 @@ export default function TimelinePage() {
     if (!confirm(`Delete "${item.title}" from your timeline?`)) return;
 
     const response = await fetch(`/api/timeline/${item.id}`, { method: "DELETE" });
-    if (!response.ok) return;
+    if (!response.ok) {
+      alert("Could not delete this timeline moment. Please try again.");
+      return;
+    }
 
     await reloadTimeline();
   };
