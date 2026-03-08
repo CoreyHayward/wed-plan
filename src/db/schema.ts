@@ -55,6 +55,18 @@ export const vendors = sqliteTable("vendors", {
     .default(sql`(datetime('now'))`),
 });
 
+export const timelineItems = sqliteTable("timeline_items", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  phase: text("phase").notNull().default("ceremony"),
+  startTime: text("start_time").notNull().default("13:00"),
+  notes: text("notes").default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
 export const households = sqliteTable("households", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
@@ -95,8 +107,10 @@ export type Setting = typeof settings.$inferSelect;
 export type Group = typeof groups.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Vendor = typeof vendors.$inferSelect;
+export type TimelineItem = typeof timelineItems.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type NewVendor = typeof vendors.$inferInsert;
+export type NewTimelineItem = typeof timelineItems.$inferInsert;
 export type Household = typeof households.$inferSelect;
 export type NewHousehold = typeof households.$inferInsert;
 export type Guest = typeof guests.$inferSelect;
