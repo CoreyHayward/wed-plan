@@ -77,7 +77,11 @@ export default function CategoryDetailPage() {
   }, [categoryId]);
 
   useEffect(() => {
-    fetchData();
+    const timeoutId = window.setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [fetchData]);
 
   const resetForm = () => {
@@ -211,6 +215,12 @@ export default function CategoryDetailPage() {
     fetchData();
   };
 
+  const deleteCategory = async () => {
+    if (!confirm("Delete this expense and all its vendor options?")) return;
+    await fetch(`/api/categories/${categoryId}`, { method: "DELETE" });
+    router.push("/");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60dvh]">
@@ -321,6 +331,14 @@ export default function CategoryDetailPage() {
           </Link>
         )}
       </div>
+      <Button
+        variant="outline"
+        onClick={deleteCategory}
+        className="w-full mb-6 text-destructive hover:text-destructive"
+      >
+        <Trash2 className="w-4 h-4 mr-1" />
+        Delete Expense
+      </Button>
 
       {/* Vendor list */}
       {vendors.length === 0 ? (
