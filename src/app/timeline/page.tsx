@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet } from "@/components/ui/sheet";
-import { CalendarClock, Clock3, Heart, Moon, Pencil, Plus, Sunrise, Trash2, UtensilsCrossed } from "lucide-react";
+import { CalendarClock, Heart, Moon, Pencil, Plus, Sunrise, Trash2, UtensilsCrossed } from "lucide-react";
 import { timelinePhases, compareTimelineItems, type TimelinePhase } from "@/lib/timeline";
 import type { TimelineItem } from "@/db/schema";
 
@@ -255,48 +255,45 @@ export default function TimelinePage() {
             {phase.items.length > 0 ? (
               <>
                 {phase.items.map((item) => (
-                  <div key={item.id} className="flex gap-3 mb-3">
-                    <div className="relative z-10 flex w-14 shrink-0 justify-center pt-5">
-                      <div className="h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-background" />
+                  <div key={item.id} className="flex gap-3 mb-1">
+                    <div className="relative z-10 flex w-14 shrink-0 justify-center pt-4">
+                      <div className="h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
                     </div>
-                    <div className="flex-1 rounded-xl border bg-background/80 p-4 shadow-sm">
-                      <div className="flex items-start justify-between gap-3">
+                    <div className="group flex-1 rounded-lg px-3 py-2.5 hover:bg-muted/50 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary" className="gap-1">
-                              <Clock3 className="w-3 h-3" />
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <span className="text-xs font-medium tabular-nums text-muted-foreground shrink-0">
                               {formatDisplayTime(item.startTime)}
-                            </Badge>
+                            </span>
+                            <h3 className="text-sm font-semibold leading-snug">{item.title}</h3>
                           </div>
-                          <h3 className="font-semibold">{item.title}</h3>
-                          {item.notes ? (
-                            <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+                          {item.notes && (
+                            <p className="text-sm text-muted-foreground mt-1 leading-relaxed whitespace-pre-wrap">
                               {item.notes}
-                            </p>
-                          ) : (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Add details like supplier cues, room changes, or music notes.
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center shrink-0 -mr-1.5 -mt-0.5">
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
                             aria-label={`Edit ${item.title}`}
                             onClick={() => openEditMoment(item)}
                           >
-                            <Pencil className="w-4 h-4" />
+                            <Pencil className="w-3.5 h-3.5" />
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
                             aria-label={`Delete ${item.title}`}
                             onClick={() => deleteMoment(item)}
                           >
-                            <Trash2 className="w-4 h-4 text-destructive" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </div>
@@ -304,17 +301,16 @@ export default function TimelinePage() {
                   </div>
                 ))}
 
-                <div className="flex gap-3 mb-6">
+                <div className="flex gap-3 mb-6 mt-2">
                   <div className="w-14 shrink-0" />
-                  <Button
+                  <button
                     type="button"
-                    variant="outline"
-                    className="flex-1"
                     onClick={() => openAddMoment(phase.value)}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Plus className="w-4 h-4 mr-1" />
+                    <Plus className="w-3.5 h-3.5" />
                     Add {phase.label.toLowerCase()} moment
-                  </Button>
+                  </button>
                 </div>
               </>
             ) : (
@@ -323,11 +319,11 @@ export default function TimelinePage() {
                 <button
                   type="button"
                   onClick={() => openAddMoment(phase.value)}
-                  className="flex-1 rounded-xl border border-dashed bg-muted/30 px-4 py-5 text-left transition-colors hover:bg-accent/40"
+                  className="flex-1 rounded-lg border border-dashed bg-muted/30 px-4 py-4 text-left transition-colors hover:bg-accent/40"
                 >
-                  <p className="font-medium">Nothing planned here yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Add a moment for {phase.label.toLowerCase()} to keep the day flowing smoothly.
+                  <p className="text-sm font-medium">Nothing planned here yet</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Tap to add a {phase.label.toLowerCase()} moment.
                   </p>
                 </button>
               </div>
