@@ -214,11 +214,7 @@ docker compose up -d --build
 ## Documentation site
 
 - Static docs live in `docs-site/`
-- Preview locally:
-  ```bash
-  cd docs-site
-  python3 -m http.server 8000
-  ```
+- Open `docs-site/index.html` directly in a browser to preview it locally
 - GitHub Pages deployment is handled by `.github/workflows/deploy-docs.yml`
 
 ---

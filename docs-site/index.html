@@ -216,46 +216,28 @@
             </ul>
           </article>
         </div>
-        <article class="card">
-          <h3>Docs site layout</h3>
-          <p>
-            The documentation site is intentionally separate from the app. Static files
-            live in <code>docs-site/</code>, so the docs can deploy to GitHub Pages
-            without changing the main Next.js runtime.
-          </p>
-        </article>
       </section>
 
       <section id="deployment" class="section">
         <div class="section__heading">
           <p class="eyebrow">Deployment</p>
-          <h2>Run the app yourself and publish the docs automatically</h2>
-        </div>
-        <div class="grid grid--2">
-          <article class="card">
-            <h3>Deploy the app</h3>
-            <ol class="list">
-              <li>Provision a server that can run Docker.</li>
-              <li>Clone the repository and keep the database on persistent storage.</li>
-              <li>Run <code>docker compose up -d --build</code>.</li>
-              <li>Point your reverse proxy or DNS at the server if you need public access.</li>
-              <li>Update by pulling new code and rebuilding the Docker image.</li>
-            </ol>
-          </article>
-          <article class="card">
-            <h3>Deploy the docs site</h3>
-            <ol class="list">
-              <li>The GitHub Actions workflow packages the <code>docs-site/</code> directory.</li>
-              <li>On pushes to <code>main</code> or manual dispatch, it publishes that static content to GitHub Pages.</li>
-              <li>In repository settings, set the Pages source to <strong>GitHub Actions</strong>.</li>
-            </ol>
-          </article>
+          <h2>Run Wed Plan yourself</h2>
         </div>
         <article class="card">
-          <h3>Preview the docs locally</h3>
-          <pre><code>cd docs-site
-python3 -m http.server 8000</code></pre>
-          <p>Then open <code>http://localhost:8000</code>.</p>
+          <h3>Deploy the app</h3>
+          <ol class="list">
+            <li>Provision a server that can run Docker.</li>
+            <li>Clone the repository and keep the database on persistent storage.</li>
+            <li>Run <code>docker compose up -d --build</code>.</li>
+            <li>Point your reverse proxy or DNS at the server if you need public access.</li>
+            <li>Update by pulling new code and rebuilding the Docker image.</li>
+          </ol>
+        </article>
+        <article class="card">
+          <h3>Update the app</h3>
+          <pre><code>git pull origin main
+docker compose up -d --build</code></pre>
+          <p>This refreshes the image and keeps the same persistent database volume in place.</p>
         </article>
       </section>
 
@@ -288,14 +270,6 @@ python3 -m http.server 8000</code></pre>
               <li>Preserve the database files when replacing containers.</li>
             </ul>
           </article>
-          <article class="card">
-            <h3>GitHub Pages is not updating</h3>
-            <ul class="list">
-              <li>Confirm Pages is configured to use <strong>GitHub Actions</strong>.</li>
-              <li>Check the <strong>Deploy Docs to GitHub Pages</strong> workflow run for failures.</li>
-              <li>Make sure your docs changes are committed on the branch that triggers the workflow.</li>
-            </ul>
-          </article>
         </div>
       </section>
 
@@ -316,10 +290,6 @@ python3 -m http.server 8000</code></pre>
           <details class="card">
             <summary>Where is my data stored?</summary>
             <p>In a SQLite database file. The location is controlled by <code>DATABASE_PATH</code> or the default data directory.</p>
-          </details>
-          <details class="card">
-            <summary>Is the docs site tied to the Next.js app build?</summary>
-            <p>No. The docs site is plain static HTML and CSS under <code>docs-site/</code>, and it deploys separately to GitHub Pages.</p>
           </details>
           <details class="card">
             <summary>What should I back up before upgrades?</summary>
