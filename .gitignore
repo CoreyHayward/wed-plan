@@ -42,3 +42,4 @@ yarn-error.log*
 # database
 /data/
 next-env.d.ts
+backups/
