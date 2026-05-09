@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wed Plan Docs</title>
+    <meta
+      name="description"
+      content="Static documentation for Wed Plan covering setup, features, configuration, deployment, troubleshooting, and FAQs."
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__content">
+        <p class="eyebrow">Wed Plan documentation</p>
+        <h1>Simple wedding planning docs for a simple, mobile-first app.</h1>
+        <p class="hero__lede">
+          Learn how to install Wed Plan, organise budgets and vendors, manage guests,
+          map out your wedding day, and keep your data safe.
+        </p>
+        <div class="hero__actions">
+          <a href="#getting-started" class="button button--primary">Get started</a>
+          <a href="#feature-guides" class="button button--secondary">Explore features</a>
+        </div>
+      </div>
+      <div class="hero__aside">
+        <div class="callout">
+          <h2>On this page</h2>
+          <nav aria-label="Section navigation">
+            <ul>
+              <li><a href="#overview">Overview</a></li>
+              <li><a href="#getting-started">Getting started</a></li>
+              <li><a href="#feature-guides">Feature guides</a></li>
+              <li><a href="#configuration">Configuration</a></li>
+              <li><a href="#deployment">Deployment</a></li>
+              <li><a href="#troubleshooting">Troubleshooting</a></li>
+              <li><a href="#faq">FAQ</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section id="overview" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">Overview</p>
+          <h2>What Wed Plan helps you do</h2>
+        </div>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>Track the budget that actually matters</h3>
+            <p>
+              Wed Plan focuses on wedding spending, vendor decisions, guest planning,
+              and the timeline for the day itself. It is designed for couples using
+              their phones, so screens stay narrow, actions stay close by, and the
+              most important numbers remain visible.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Core concepts</h3>
+            <ul class="list">
+              <li><strong>Groups</strong> organise related expenses like Food, Venue, or Attire.</li>
+              <li><strong>Expenses</strong> are individual planning items such as Venue or Photographer.</li>
+              <li><strong>Vendor options</strong> let you compare quotes, notes, contacts, and payment status.</li>
+              <li><strong>Guests</strong> track RSVPs, parties, households, and special requirements.</li>
+              <li><strong>Timeline</strong> keeps the wedding day plan in one place.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="getting-started" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">Getting started</p>
+          <h2>Run the app locally in a few minutes</h2>
+        </div>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>Docker setup</h3>
+            <ol class="list">
+              <li>Clone the repository.</li>
+              <li>Run <code>docker compose up -d --build</code>.</li>
+              <li>Open <code>http://localhost:3000</code>.</li>
+              <li>The database is created automatically on first start.</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Local development</h3>
+            <ol class="list">
+              <li>Install dependencies with <code>npm ci</code>.</li>
+              <li>Start the app with <code>npm run dev</code>.</li>
+              <li>Open <code>http://localhost:3000</code>.</li>
+              <li>Use the bottom navigation to move between dashboard, timeline, guests, and settings.</li>
+            </ol>
+          </article>
+        </div>
+        <article class="card">
+          <h3>Recommended first-run workflow</h3>
+          <ol class="list">
+            <li>Open <strong>Settings</strong> and add the couple names, wedding date, and total budget.</li>
+            <li>Create or rename groups to match the areas you are budgeting for.</li>
+            <li>Add expenses inside each group.</li>
+            <li>Add vendor options for each expense and mark the preferred choice as <strong>Selected</strong>.</li>
+            <li>Add guests and households once the budget is taking shape.</li>
+            <li>Build the wedding day timeline as plans become firm.</li>
+          </ol>
+        </article>
+      </section>
+
+      <section id="feature-guides" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">Feature guides</p>
+          <h2>Use every part of the app with confidence</h2>
+        </div>
+
+        <div class="feature">
+          <div class="feature__copy">
+            <h3>Dashboard and expense planning</h3>
+            <ul class="list">
+              <li>See the total budget, committed amount, paid amount, and outstanding spend.</li>
+              <li>Create expense groups and add expenses directly from the dashboard.</li>
+              <li>Collapse groups to keep the mobile view manageable.</li>
+              <li>Reorder expenses within a group with drag handles.</li>
+              <li>Watch reminders for deposit and final payment dates on selected vendors.</li>
+            </ul>
+          </div>
+          <figure class="phone-shot">
+            <img src="./assets/images/dashboard-mobile.png" alt="Mobile screenshot of the Wed Plan dashboard" />
+            <figcaption>Dashboard view with grouped expenses, reminders, and top-level budget totals.</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature feature--reverse">
+          <div class="feature__copy">
+            <h3>Expense details and vendor comparison</h3>
+            <ul class="list">
+              <li>Open any expense to set a budget allocation and move it to another group.</li>
+              <li>Add multiple vendor options with notes, pros, cons, contact details, and payment dates.</li>
+              <li>Mark the preferred option as <strong>Selected</strong> and later toggle it to <strong>Booked</strong>.</li>
+              <li>Use the compare view when you have two or more options for the same expense.</li>
+              <li>Track deposit paid, total paid, and how much remains against the expense budget.</li>
+            </ul>
+          </div>
+          <figure class="phone-shot">
+            <img src="./assets/images/expense-detail-mobile.png" alt="Mobile screenshot of an expense detail page" />
+            <figcaption>Expense detail view showing selected vendors, payment dates, and option actions.</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature">
+          <div class="feature__copy">
+            <h3>Guest list and households</h3>
+            <ul class="list">
+              <li>Track guests by party, attendance type, and RSVP status.</li>
+              <li>Create households for shared addresses and grouped invitations.</li>
+              <li>Record plus-ones, dietary requirements, allergies, accessibility needs, and table assignments.</li>
+              <li>Filter and search the guest list as it grows.</li>
+              <li>Export guest data when you need to share it elsewhere.</li>
+            </ul>
+          </div>
+          <figure class="phone-shot">
+            <img src="./assets/images/guests-mobile.png" alt="Mobile screenshot of the guest list page" />
+            <figcaption>Guest list summary with RSVP, party, household, and filter controls.</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature feature--reverse">
+          <div class="feature__copy">
+            <h3>Timeline and settings</h3>
+            <ul class="list">
+              <li>Split the day into phases and add timeline moments for each one.</li>
+              <li>Store a wedding date so the timeline is anchored to the right day.</li>
+              <li>Switch between light, dark, and system theme modes.</li>
+              <li>Keep the app personalised with couple names and a total budget in settings.</li>
+            </ul>
+          </div>
+          <div class="stacked-shots">
+            <figure class="phone-shot">
+              <img src="./assets/images/timeline-mobile.png" alt="Mobile screenshot of the wedding timeline page" />
+              <figcaption>Timeline view with wedding-day phases and planned moments.</figcaption>
+            </figure>
+            <figure class="phone-shot">
+              <img src="./assets/images/settings-mobile.png" alt="Mobile screenshot of the settings page" />
+              <figcaption>Settings page for couple details, budget, and theme preferences.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="configuration" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">Configuration</p>
+          <h2>Runtime and data configuration</h2>
+        </div>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>Environment variables</h3>
+            <p>The app currently supports one runtime setting:</p>
+            <ul class="list">
+              <li><code>DATABASE_PATH</code> — overrides where the SQLite database file is stored.</li>
+            </ul>
+            <p>
+              In Docker, the default path is <code>/data/wedding.db</code>. In local
+              development, the default path is <code>./data/wedding.db</code>.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Data and backups</h3>
+            <ul class="list">
+              <li>The app stores data in a SQLite database.</li>
+              <li>Docker Compose mounts the database inside the named volume <code>wed-plan-data</code>.</li>
+              <li>Back up the database file before upgrades if the data matters.</li>
+              <li>Because the database is file based, restore is usually just copying the files back into place.</li>
+            </ul>
+          </article>
+        </div>
+        <article class="card">
+          <h3>Docs site layout</h3>
+          <p>
+            The documentation site is intentionally separate from the app. Static files
+            live in <code>docs-site/</code>, so the docs can deploy to GitHub Pages
+            without changing the main Next.js runtime.
+          </p>
+        </article>
+      </section>
+
+      <section id="deployment" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">Deployment</p>
+          <h2>Run the app yourself and publish the docs automatically</h2>
+        </div>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>Deploy the app</h3>
+            <ol class="list">
+              <li>Provision a server that can run Docker.</li>
+              <li>Clone the repository and keep the database on persistent storage.</li>
+              <li>Run <code>docker compose up -d --build</code>.</li>
+              <li>Point your reverse proxy or DNS at the server if you need public access.</li>
+              <li>Update by pulling new code and rebuilding the Docker image.</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Deploy the docs site</h3>
+            <ol class="list">
+              <li>The GitHub Actions workflow packages the <code>docs-site/</code> directory.</li>
+              <li>On pushes to <code>main</code> or manual dispatch, it publishes that static content to GitHub Pages.</li>
+              <li>In repository settings, set the Pages source to <strong>GitHub Actions</strong>.</li>
+            </ol>
+          </article>
+        </div>
+        <article class="card">
+          <h3>Preview the docs locally</h3>
+          <pre><code>cd docs-site
+python3 -m http.server 8000</code></pre>
+          <p>Then open <code>http://localhost:8000</code>.</p>
+        </article>
+      </section>
+
+      <section id="troubleshooting" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">Troubleshooting</p>
+          <h2>Common problems and quick fixes</h2>
+        </div>
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>The app is not reachable</h3>
+            <ul class="list">
+              <li>Check <code>docker compose ps</code> if you are using Docker.</li>
+              <li>Review container logs with <code>docker logs wed-plan --tail 200</code>.</li>
+              <li>Confirm the app is listening on port <code>3000</code>.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>The latest code is not showing up</h3>
+            <ul class="list">
+              <li>Rebuild the container with <code>docker compose up -d --build</code>.</li>
+              <li>If needed, stop and restart the stack with <code>docker compose down</code> followed by <code>docker compose up -d --build</code>.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>The database path is wrong</h3>
+            <ul class="list">
+              <li>Set <code>DATABASE_PATH</code> to a writable location.</li>
+              <li>Make sure the target directory exists or can be created by the app process.</li>
+              <li>Preserve the database files when replacing containers.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>GitHub Pages is not updating</h3>
+            <ul class="list">
+              <li>Confirm Pages is configured to use <strong>GitHub Actions</strong>.</li>
+              <li>Check the <strong>Deploy Docs to GitHub Pages</strong> workflow run for failures.</li>
+              <li>Make sure your docs changes are committed on the branch that triggers the workflow.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="faq" class="section">
+        <div class="section__heading">
+          <p class="eyebrow">FAQ</p>
+          <h2>Short answers to common questions</h2>
+        </div>
+        <div class="faq">
+          <details class="card" open>
+            <summary>Can I use Wed Plan without Docker?</summary>
+            <p>Yes. Install dependencies with <code>npm ci</code> and run the app with <code>npm run dev</code>.</p>
+          </details>
+          <details class="card">
+            <summary>Does the app support multiple vendor quotes per expense?</summary>
+            <p>Yes. Each expense can hold multiple vendor options, and one option can be marked as selected or booked.</p>
+          </details>
+          <details class="card">
+            <summary>Where is my data stored?</summary>
+            <p>In a SQLite database file. The location is controlled by <code>DATABASE_PATH</code> or the default data directory.</p>
+          </details>
+          <details class="card">
+            <summary>Is the docs site tied to the Next.js app build?</summary>
+            <p>No. The docs site is plain static HTML and CSS under <code>docs-site/</code>, and it deploys separately to GitHub Pages.</p>
+          </details>
+          <details class="card">
+            <summary>What should I back up before upgrades?</summary>
+            <p>Back up the SQLite database file and its related WAL/SHM files if they exist.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
