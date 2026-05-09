@@ -375,7 +375,7 @@ export default function DashboardPage() {
                   {group.expenses.map((cat) => (
                     <div
                       key={cat.id}
-                      className="mb-2 last:mb-0"
+                      className="flex items-stretch gap-2 mb-2 last:mb-0"
                       onDragOver={(event) => {
                         if (draggedGroupId !== group.id) return;
                         event.preventDefault();
@@ -386,28 +386,25 @@ export default function DashboardPage() {
                         void reorderExpenses(group.id, cat.id);
                       }}
                     >
-                      <Link href={`/categories/${cat.id}`} className="block relative">
+                      <button
+                        type="button"
+                        draggable
+                        aria-label={`Reorder ${cat.name}`}
+                        onClick={(event) => event.preventDefault()}
+                        onDragStart={(event) => handleDragStart(event, group.id, cat.id)}
+                        onDragEnd={handleDragEnd}
+                        className="px-2 rounded-lg border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground/40 cursor-grab active:cursor-grabbing"
+                      >
+                        <GripVertical className="w-4 h-4" />
+                      </button>
+                      <Link href={`/categories/${cat.id}`} className="block flex-1">
                         <Card
-                          className={`cursor-pointer transition-colors pl-10 ${
+                          className={`cursor-pointer transition-colors ${
                             dragOverExpenseId === cat.id && draggedExpenseId !== cat.id
                               ? "ring-2 ring-primary/40 bg-accent/20"
                               : "hover:bg-accent/30"
                           }`}
                         >
-                          {/* Drag handle moved inside the card as an absolute, touch-friendly control */}
-                          <button
-                            type="button"
-                            draggable
-                            aria-label={`Reorder ${cat.name}`}
-                            onClick={(event) => event.preventDefault()}
-                            onDragStart={(event) => handleDragStart(event, group.id, cat.id)}
-                            onDragEnd={handleDragEnd}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-md border border-dashed border-border text-muted-foreground bg-transparent touch-manipulation" 
-                            style={{ WebkitTapHighlightColor: 'transparent' }}
-                          >
-                            <GripVertical className="w-4 h-4" />
-                          </button>
-
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                               <div className="flex-1 min-w-0">
