@@ -7,7 +7,6 @@ on:
     paths:
       - "docs-site/**"
       - ".github/workflows/deploy-docs.yml"
-      - "README.md"
   workflow_dispatch:
 
 permissions:
