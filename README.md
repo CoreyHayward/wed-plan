@@ -211,6 +211,14 @@ docker compose up -d --build
 
 ---
 
+## Documentation site
+
+- Static docs live in `docs-site/`
+- Open `docs-site/index.html` directly in a browser to preview it locally
+- GitHub Pages deployment is handled by `.github/workflows/deploy-docs.yml`
+
+---
+
 ## Troubleshooting
 
 ### App doesn’t reflect latest code
