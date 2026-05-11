@@ -95,6 +95,7 @@ export default function GuestsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterParty, setFilterParty] = useState("");
+  const [filterAttendance, setFilterAttendance] = useState("");
   const [filterRsvp, setFilterRsvp] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showSummary, setShowSummary] = useState(true);
@@ -315,8 +316,9 @@ export default function GuestsPage() {
       (g.householdName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       (g.tableAssignment || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesParty = !filterParty || g.party === filterParty;
+    const matchesAttendance = !filterAttendance || g.attendance === filterAttendance;
     const matchesRsvp = !filterRsvp || g.rsvpStatus === filterRsvp;
-    return matchesSearch && matchesParty && matchesRsvp;
+    return matchesSearch && matchesParty && matchesAttendance && matchesRsvp;
   });
 
   const nonPlusOneGuests = data.guests.filter((g) => !g.isPlusOne);
@@ -466,7 +468,11 @@ export default function GuestsPage() {
           </div>
           <Button
             size="icon"
-            variant={showFilters || filterParty || filterRsvp ? "default" : "outline"}
+            variant={
+              showFilters || filterParty || filterAttendance || filterRsvp
+                ? "default"
+                : "outline"
+            }
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="w-4 h-4" />
@@ -474,7 +480,7 @@ export default function GuestsPage() {
         </div>
 
         {showFilters && (
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <select
               value={filterParty}
               onChange={(e) => setFilterParty(e.target.value)}
@@ -482,6 +488,18 @@ export default function GuestsPage() {
             >
               <option value="">All Parties</option>
               {PARTY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filterAttendance}
+              onChange={(e) => setFilterAttendance(e.target.value)}
+              className="flex-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="">All Attendance</option>
+              {ATTENDANCE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
