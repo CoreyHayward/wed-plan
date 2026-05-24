@@ -5,16 +5,7 @@ import { categories, groups, vendors } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-export type Reminder = {
-  vendorId: number;
-  vendorName: string;
-  categoryId: number;
-  categoryName: string;
-  type: "deposit" | "final";
-  dueDate: string;
-  daysUntil: number;
-  status: "overdue" | "today" | "upcoming";
-};
+import { buildVendorReminders, type Reminder } from "./reminders";
 
 export type ExpenseSummary = {
   id: number;
@@ -83,29 +74,7 @@ export async function GET() {
   let totalPaid = 0;
   const reminders: Reminder[] = [];
 
-  const dateOnly = (d: Date) => d.toISOString().slice(0, 10);
   const today = new Date();
-  const todayUtc = new Date(`${dateOnly(today)}T00:00:00Z`);
-
-  const buildReminder = (
-    dueDate: string,
-    type: "deposit" | "final",
-    vendor: (typeof allVendors)[number],
-    categoryName: string
-  ): Reminder => {
-    const dueUtc = new Date(`${dueDate}T00:00:00Z`);
-    const daysUntil = Math.round((dueUtc.getTime() - todayUtc.getTime()) / 86400000);
-    return {
-      vendorId: vendor.id,
-      vendorName: vendor.name,
-      categoryId: vendor.categoryId,
-      categoryName,
-      type,
-      dueDate,
-      daysUntil,
-      status: daysUntil < 0 ? "overdue" : daysUntil === 0 ? "today" : "upcoming",
-    };
-  };
 
   const categoryData: ExpenseSummary[] = allCategories.map((cat) => {
     const catVendors = allVendors.filter((v) => v.categoryId === cat.id);
@@ -115,12 +84,7 @@ export async function GET() {
       totalCommitted += selected.price;
       totalPaid += selected.totalPaid;
 
-      if (selected.depositDueDate) {
-        reminders.push(buildReminder(selected.depositDueDate, "deposit", selected, cat.name));
-      }
-      if (selected.finalPaymentDueDate) {
-        reminders.push(buildReminder(selected.finalPaymentDueDate, "final", selected, cat.name));
-      }
+      reminders.push(...buildVendorReminders(selected, cat.name, today));
     }
 
     return {
