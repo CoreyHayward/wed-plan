@@ -19,6 +19,11 @@
 
 # production
 /build
+/artifacts
+
+# generated iOS build products
+/ios/App/build
+/ios/DerivedData
 
 # misc
 .DS_Store

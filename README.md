@@ -141,6 +141,71 @@ npm run dev
 
 ---
 
+## iPhone app (sideloading)
+
+The repository includes a Capacitor iOS app that displays the same Next.js UI and uses the same API/database as the web app. The iPhone therefore needs network access to a running Wed Plan server; data remains in that server's SQLite database.
+
+Requirements:
+
+- macOS with Xcode 26 or newer
+- Node.js 22 or newer
+- a Wed Plan server URL reachable from the iPhone (HTTPS is recommended)
+- Tesseract (`brew install tesseract`) for the OCR-backed simulator smoke checks
+
+### Build an unsigned IPA
+
+```bash
+npm ci
+npm run ios:ipa
+```
+
+The output is:
+
+```text
+artifacts/WedPlan-unsigned.ipa
+```
+
+With no build-time URL, the first launch shows a connection screen where you can enter the server URL. To bake in a default URL instead:
+
+```bash
+WED_PLAN_SERVER_URL=https://wed-plan.example.com npm run ios:ipa
+```
+
+The URL can still be replaced later from the app's connection-error screen.
+
+The generated IPA is intentionally unsigned. To sign with a personal Apple developer account, open the project, choose the `App` target, select your Team under Signing & Capabilities, and run or archive it from Xcode:
+
+```bash
+npm run ios:open
+```
+
+### iOS development and verification
+
+```bash
+# Sync web/native configuration and plugins
+npm run ios:sync
+
+# Build for the local iPhone Simulator (defaults to http://127.0.0.1:3000)
+npm run ios:simulator
+
+# Build the first-launch connection-screen variant instead
+WED_PLAN_SERVER_URL= npm run ios:simulator
+
+# With the Next.js server running, verify and capture all seven UI routes
+npm run ios:smoke
+
+# Re-check the deep-route launch regression and captured UI screenshots
+npm run ios:launch-check
+npm run ios:screenshot-check
+
+# Validate the IPA; add WED_PLAN_SERVER_URL to include live route/API checks
+npm run ios:verify
+```
+
+The native guest-list export writes the CSV to the app cache and opens the iOS share sheet. Browser exports keep their existing behavior.
+
+---
+
 ## Runtime configuration
 
 Environment variables:

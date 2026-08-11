@@ -7,11 +7,24 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "ios:sync": "node scripts/ios.mjs sync",
+    "ios:open": "npx cap open ios",
+    "ios:simulator": "node scripts/ios.mjs simulator",
+    "ios:access-check": "node scripts/check-ios-access-navigation.mjs",
+    "ios:launch-check": "node scripts/check-ios-launch.mjs",
+    "ios:screenshot-check": "node scripts/check-ios-screenshots.mjs",
+    "ios:smoke": "node scripts/smoke-ios-simulator.mjs",
+    "ios:ipa": "node scripts/ios.mjs ipa",
+    "ios:verify": "node scripts/verify-ios.mjs",
     "db:seed": "npx tsx src/db/seed.ts",
     "db:push": "npx drizzle-kit push",
     "db:studio": "npx drizzle-kit studio"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/ios": "^8.5.0",
+    "@capacitor/share": "^8.0.1",
     "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -23,6 +36,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.0",
     "@tailwindcss/postcss": "^4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",

@@ -18,6 +18,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
   themeColor: "#8b6f4e",
 };
 
@@ -34,15 +35,26 @@ export default function RootLayout({
             __html: `(() => {
               try {
                 const saved = localStorage.getItem('theme');
+                const theme = saved === 'dark' || saved === 'light' ? saved : 'system';
                 if (saved === 'dark' || saved === 'light') {
                   document.documentElement.classList.remove('light', 'dark');
                   document.documentElement.classList.add(saved);
                 }
+                const syncNativeTheme = (nextTheme) => {
+                  window.webkit?.messageHandlers?.wedPlanSettings?.postMessage({
+                    action: 'setTheme',
+                    theme: nextTheme,
+                  });
+                };
+                window.addEventListener('wed-plan-theme-change', (event) => {
+                  syncNativeTheme(event.detail);
+                });
+                syncNativeTheme(theme);
               } catch {}
             })();`,
           }}
         />
-        <main className="pb-20 min-h-dvh">
+        <main className="app-main min-h-dvh">
           {children}
         </main>
         <BottomNav />

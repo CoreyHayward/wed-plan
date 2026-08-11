@@ -40,7 +40,11 @@ export default function ComparePage() {
   }, [categoryId]);
 
   useEffect(() => {
-    fetchData();
+    const timeoutId = window.setTimeout(() => {
+      void fetchData();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [fetchData]);
 
   const selectVendor = async (vendorId: number) => {

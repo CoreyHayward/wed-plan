@@ -22,11 +22,15 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    fetchSettings();
-    const html = document.documentElement;
-    if (html.classList.contains("dark")) setTheme("dark");
-    else if (html.classList.contains("light")) setTheme("light");
-    else setTheme("system");
+    const timeoutId = window.setTimeout(() => {
+      void fetchSettings();
+      const html = document.documentElement;
+      if (html.classList.contains("dark")) setTheme("dark");
+      else if (html.classList.contains("light")) setTheme("light");
+      else setTheme("system");
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [fetchSettings]);
 
   const saveSettings = async () => {
@@ -50,6 +54,9 @@ export default function SettingsPage() {
     } else {
       localStorage.removeItem("theme");
     }
+    window.dispatchEvent(
+      new CustomEvent("wed-plan-theme-change", { detail: next }),
+    );
     setTheme(next);
   };
 

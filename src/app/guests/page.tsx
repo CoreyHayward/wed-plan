@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Directory, Encoding, Filesystem } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import {
   Card,
   CardContent,
@@ -272,8 +275,34 @@ export default function GuestsPage() {
     fetchData();
   };
 
-  const exportCsv = () => {
-    window.open("/api/guests/export", "_blank");
+  const exportCsv = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      window.open("/api/guests/export", "_blank");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/guests/export");
+      if (!response.ok) throw new Error("Could not export guest list");
+
+      const csv = await response.text();
+      const result = await Filesystem.writeFile({
+        path: "guest-list.csv",
+        data: csv,
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      });
+
+      await Share.share({
+        title: "Wed Plan guest list",
+        text: "Guest list exported from Wed Plan",
+        url: result.uri,
+        dialogTitle: "Export guest list",
+      });
+    } catch (error) {
+      console.error("Failed to export guest list:", error);
+      alert("Could not export the guest list. Please try again.");
+    }
   };
 
   const rankedHouseholds = useMemo(() => {

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Plain-JS database initialiser — runs on every container start.
  * Creates tables if they don't exist and seeds default data on first run.
