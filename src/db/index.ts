@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as schema from "./schema";
+import { ensureRoomsSchema } from "./rooms";
 import path from "path";
 import fs from "fs";
 
@@ -22,6 +23,7 @@ export function getDb() {
   const sqlite = new Database(DB_PATH);
   sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("foreign_keys = ON");
+  ensureRoomsSchema(sqlite);
 
   _db = drizzle(sqlite, { schema });
   return _db;

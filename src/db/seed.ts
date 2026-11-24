@@ -71,6 +71,15 @@ export async function seed() {
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`);
 
+  db.run(sql`CREATE TABLE IF NOT EXISTS rooms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_name TEXT NOT NULL,
+    room_name TEXT NOT NULL,
+    capacity INTEGER,
+    notes TEXT DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+
   db.run(sql`CREATE TABLE IF NOT EXISTS guests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT NOT NULL,
@@ -78,6 +87,7 @@ export async function seed() {
     email TEXT DEFAULT '',
     phone TEXT DEFAULT '',
     household_id INTEGER REFERENCES households(id) ON DELETE SET NULL,
+    room_id INTEGER REFERENCES rooms(id) ON DELETE SET NULL,
     party TEXT NOT NULL DEFAULT 'joint',
     attendance TEXT NOT NULL DEFAULT 'all',
     rsvp_status TEXT NOT NULL DEFAULT 'pending',
@@ -90,6 +100,7 @@ export async function seed() {
     notes TEXT DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`);
+  db.run(sql`CREATE INDEX IF NOT EXISTS idx_guests_room_id ON guests(room_id)`);
 
   // Check if already seeded
   const existing = db.select().from(settings).all();

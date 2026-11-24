@@ -139,11 +139,25 @@ export default function DashboardPage() {
 
   if (!data) return null;
 
-  const remainingBudget = data.totalBudget - data.totalCommitted;
+  const allocatedPence = data.categories.reduce(
+    (sum, expense) => sum + Math.round((expense.budgetAllocation || 0) * 100),
+    0
+  );
+  const budgetPence = Math.round(data.totalBudget * 100);
+  const totalAllocated = allocatedPence / 100;
+  const balancePence = budgetPence - allocatedPence;
+  const isOverBudget = balancePence < 0;
+  const hasBudget = budgetPence > 0;
+  const allocatedPercentage = hasBudget
+    ? new Intl.NumberFormat("en-GB", {
+        style: "percent",
+        maximumFractionDigits: 2,
+      }).format(allocatedPence / budgetPence)
+    : null;
   const budgetVariant =
-    remainingBudget < 0
+    isOverBudget
       ? "danger"
-      : remainingBudget < data.totalBudget * 0.1
+      : hasBudget && balancePence < budgetPence * 0.1
       ? "warning"
       : "default";
 
@@ -260,20 +274,38 @@ export default function DashboardPage() {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <div className="flex justify-between text-sm mb-1.5">
-                <span className="text-muted-foreground">Committed</span>
+              <div className="flex flex-wrap justify-between gap-x-2 text-sm mb-1.5">
+                <span className="text-muted-foreground">Allocated budget</span>
                 <span className="font-semibold">
-                  {formatCurrency(data.totalCommitted)} / {formatCurrency(data.totalBudget)}
+                  {hasBudget
+                    ? `${formatCurrency(totalAllocated)} / ${formatCurrency(data.totalBudget)}`
+                    : formatCurrency(totalAllocated)}
                 </span>
               </div>
-              <ProgressBar value={data.totalCommitted} max={data.totalBudget} variant={budgetVariant} />
+              {hasBudget ? (
+                <>
+                  <ProgressBar value={allocatedPence} max={budgetPence} variant={budgetVariant} />
+                  <div className="flex flex-wrap justify-between gap-x-2 mt-1.5 text-xs text-muted-foreground">
+                    <span>{allocatedPercentage} allocated</span>
+                    <span className={isOverBudget ? "font-medium text-destructive" : undefined}>
+                      {balancePence === 0
+                        ? "Fully allocated"
+                        : `${formatCurrency(Math.abs(balancePence) / 100)} ${isOverBudget ? "over budget" : "left to allocate"}`}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <Link href="/settings" className="text-xs text-primary underline">
+                  Set an overall budget
+                </Link>
+              )}
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center p-2 rounded-lg bg-muted/50">
                 <TrendingUp className="w-4 h-4 mx-auto mb-1 text-primary" />
-                <p className="text-xs text-muted-foreground">Remaining</p>
-                <p className="text-sm font-semibold">{formatCurrency(Math.max(0, remainingBudget))}</p>
+                <p className="text-xs text-muted-foreground">Committed</p>
+                <p className="text-sm font-semibold">{formatCurrency(data.totalCommitted)}</p>
               </div>
               <div className="text-center p-2 rounded-lg bg-muted/50">
                 <CreditCard className="w-4 h-4 mx-auto mb-1 text-success" />

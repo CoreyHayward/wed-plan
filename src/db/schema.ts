@@ -76,6 +76,17 @@ export const households = sqliteTable("households", {
     .default(sql`(datetime('now'))`),
 });
 
+export const rooms = sqliteTable("rooms", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  propertyName: text("property_name").notNull(),
+  roomName: text("room_name").notNull(),
+  capacity: integer("capacity"),
+  notes: text("notes").default(""),
+  createdAt: text("created_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
 export const guests = sqliteTable("guests", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   firstName: text("first_name").notNull(),
@@ -83,6 +94,9 @@ export const guests = sqliteTable("guests", {
   email: text("email").default(""),
   phone: text("phone").default(""),
   householdId: integer("household_id").references(() => households.id, {
+    onDelete: "set null",
+  }),
+  roomId: integer("room_id").references(() => rooms.id, {
     onDelete: "set null",
   }),
   party: text("party").notNull().default("joint"),
@@ -113,5 +127,7 @@ export type NewVendor = typeof vendors.$inferInsert;
 export type NewTimelineItem = typeof timelineItems.$inferInsert;
 export type Household = typeof households.$inferSelect;
 export type NewHousehold = typeof households.$inferInsert;
+export type Room = typeof rooms.$inferSelect;
+export type NewRoom = typeof rooms.$inferInsert;
 export type Guest = typeof guests.$inferSelect;
 export type NewGuest = typeof guests.$inferInsert;

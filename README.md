@@ -87,6 +87,11 @@ Each option can be:
 - Total budget
 - Theme: **Light / Dark / System**
 
+## Rooms
+- Record booked accommodation rooms with property, room name/number, optional capacity, and notes
+- Assign, unassign, or reassign existing guests; a guest can only occupy one room
+- See unassigned guests and occupancy, including non-blocking over-capacity warnings
+
 ## Data safety
 - SQLite with WAL mode
 - Non-destructive startup migrations for new columns/tables
@@ -258,6 +263,9 @@ docker compose up -d --build
 - `GET/POST /api/categories` (expenses)
 - `GET/PUT/DELETE /api/categories/:id`
 - `GET/POST /api/categories/:id/vendors`
+- `GET/POST /api/rooms`
+- `GET/PUT/DELETE /api/rooms/:id`
+- `PUT /api/rooms/:id/guests`
 - `GET/PUT/DELETE /api/vendors/:id`
 - `PUT /api/vendors/:id/select`
 - `PUT /api/vendors/:id/deselect`

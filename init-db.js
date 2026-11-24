@@ -67,6 +67,15 @@ db.exec(`
     created_at TEXT    NOT NULL DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS rooms (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_name TEXT    NOT NULL,
+    room_name     TEXT    NOT NULL,
+    capacity      INTEGER,
+    notes         TEXT    DEFAULT '',
+    created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS guests (
     id                   INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name           TEXT    NOT NULL,
@@ -74,6 +83,7 @@ db.exec(`
     email                TEXT    DEFAULT '',
     phone                TEXT    DEFAULT '',
     household_id         INTEGER REFERENCES households(id) ON DELETE SET NULL,
+    room_id              INTEGER REFERENCES rooms(id) ON DELETE SET NULL,
     party                TEXT    NOT NULL DEFAULT 'joint',
     attendance           TEXT    NOT NULL DEFAULT 'all',
     rsvp_status          TEXT    NOT NULL DEFAULT 'pending',
@@ -101,6 +111,8 @@ ensureColumn("vendors", "is_booked", "INTEGER NOT NULL DEFAULT 0");
 ensureColumn("vendors", "deposit_due_date", "TEXT");
 ensureColumn("vendors", "final_payment_due_date", "TEXT");
 ensureColumn("categories", "group_id", "INTEGER NOT NULL DEFAULT 1");
+ensureColumn("guests", "room_id", "INTEGER REFERENCES rooms(id) ON DELETE SET NULL");
+db.exec("CREATE INDEX IF NOT EXISTS idx_guests_room_id ON guests(room_id)");
 
 // Ensure at least one group exists and backfill category group ids
 const groupCount = db.prepare("SELECT COUNT(*) AS count FROM groups").get();

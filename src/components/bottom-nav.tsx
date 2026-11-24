@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Settings, CalendarClock } from "lucide-react";
+import { LayoutDashboard, Users, Settings, CalendarClock, BedDouble } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/timeline", label: "Timeline", icon: CalendarClock },
   { href: "/guests", label: "Guests", icon: Users },
+  { href: "/rooms", label: "Rooms", icon: BedDouble },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
